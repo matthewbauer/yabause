@@ -3,6 +3,10 @@ DYNAREC = 0
 HAVE_THREADS = 1
 HAVE_GRIFFIN = 1
 
+ifneq ($(EMSCRIPTEN),)
+	platform = emscripten
+endif
+
 ifeq ($(platform),)
 	platform = unix
 	ifeq ($(shell uname -a),)
@@ -178,6 +182,10 @@ else ifneq (,$(findstring armv,$(platform)))
 	endif
 	FLAGS += -DARM
 
+# emscripten
+else ifeq ($(platform), emscripten)
+	TARGET := $(TARGET_NAME)_libretro_emscripten.bc
+
 # Windows
 else
 	TARGET := $(TARGET_NAME)_libretro.dll
@@ -246,7 +254,7 @@ endif
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
-	
+
 $(C68KEXEC_OBJECT): $(C68KEXEC_SOURCE)
 	$(CC) -c -o $@ $< $(CFLAGS) -O0
 
